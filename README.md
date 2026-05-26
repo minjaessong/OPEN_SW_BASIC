@@ -29,12 +29,13 @@ pip install -r requirements.txt
 ```
 
 ### 2. 환경 변수 설정
-`.env.example` 파일을 복사하여 `.env` 파일을 생성하고 내용을 알맞게 채웁니다.
-```bash
-cp .env.example .env
+이 프로젝트는 팀원 간 빠른 공유를 위해 환경 변수 값을 공유합니다.
+프로젝트 최상단(또는 project 폴더 내)에 `.env` 파일을 생성하고 아래 내용을 그대로 복사해 넣으세요.
+
+```env
+DATABASE_URL=postgresql://postgres.mpmlkgszkysgupdsafgw:DiHCpFPVAPh9GUwg@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres
+SECRET_KEY=dev-secret-key
 ```
-`.env` 파일에 발급받은 Supabase의 `DATABASE_URL`을 입력하세요.
-(예: `postgresql://postgres.xxx:password@aws-0-ap-northeast-2.pooler.supabase.com:6543/postgres`)
 
 ### 3. 데이터베이스 초기화 및 관리자 계정 생성
 다음 스크립트를 실행하면 테이블 생성, 기본 탭 삽입, **기본 관리자 계정** 생성이 자동으로 진행됩니다.
@@ -57,8 +58,12 @@ python app.py
 ## Render 배포 방법
 1. Render(https://render.com)에 로그인 후 "New Web Service"를 선택합니다.
 2. 이 코드가 저장된 GitHub 저장소를 연결합니다.
-3. **Build Command:** `pip install -r requirements.txt`
-4. **Start Command:** `gunicorn app:app` (루트 경로에 app.py가 있을 경우)
-5. **Environment Variables:** 설정 탭에서 `DATABASE_URL`과 `SECRET_KEY` 값을 추가합니다.
+3. 배포 설정에서 아래 내용들을 정확하게 입력합니다:
+   - **Root Directory:** `project` (GitHub 최상단이 아닌 project 폴더 안에 코드가 있을 경우 필수)
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `gunicorn app:app`
+4. **Environment Variables** 설정 탭에서 팀 공용 환경 변수를 똑같이 추가합니다.
+   - `DATABASE_URL` : `postgresql://postgres.mpmlkgszkysgupdsafgw:DiHCpFPVAPh9GUwg@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres`
+   - `SECRET_KEY` : `dev-secret-key`
 
-배포가 완료되면 Render에서 제공하는 `.onrender.com` 도메인을 통해 접속할 수 있습니다.
+5. 배포가 완료되면 Render에서 제공하는 `.onrender.com` 도메인을 통해 누구나 접속할 수 있습니다.
