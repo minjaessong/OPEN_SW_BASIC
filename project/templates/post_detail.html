@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="post-detail">
+    <div class="post-header">
+        <span class="tab-badge">{{ post.tab_name or '기본' }}</span>
+        <h2 class="post-title">{{ post.title }}</h2>
+        <div class="post-meta">
+            <span class="author">작성자: {{ post.author }}</span> | 
+            <span class="date">작성일: {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        </div>
+    </div>
+    
+    <div class="post-body">
+        {{ post.content | replace('\n', '<br>') | safe }}
+    </div>
+    
+    <div class="post-reactions">
+        {% if current_user_id %}
+            <button onclick="toggleReaction({{ post.id }}, 'LIKE')" class="btn reaction-btn {% if user_reaction == 'LIKE' %}active-like{% endif %}">
+                👍 좋아요 ({{ post.like_count }})
+            </button>
+            <button onclick="toggleReaction({{ post.id }}, 'DISLIKE')" class="btn reaction-btn {% if user_reaction == 'DISLIKE' %}active-dislike{% endif %}">
+                👎 싫어요 ({{ post.dislike_count }})
+            </button>
+        {% else %}
+            <span class="reaction-stat">👍 좋아요: {{ post.like_count }}</span>
+            <span class="reaction-stat">👎 싫어요: {{ post.dislike_count }}</span>
+        {% endif %}
+    </div>
+    
+    <div class="post-actions">
+        <a href="{{ url_for('post_list') }}" class="btn btn-outline">목록으로</a>
+        
+        {% if session.get('db_id') == post.user_id or current_user_role == 'ADMIN' %}
+            <a href="{{ url_for('post_edit', post_id=post.id) }}" class="btn btn-outline">수정</a>
+            <form method="POST" action="{{ url_for('post_delete', post_id=post.id) }}" class="inline-form" onsubmit="return confirmDelete('정말 이 게시글을 삭제하시겠습니까?');">
+                <button type="submit" class="btn btn-danger">삭제</button>
+            </form>
+        {% endif %}
+    </div>
+    
+    <hr>
+    
+    <div class="comments-section">
+        <h3>댓글</h3>
+        
+        <div class="comment-list">
+            {% for comment in comments %}
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <strong>{{ comment.author }}</strong>
+                        <span class="comment-date">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        {% if session.get('db_id') == comment.user_id or current_user_role == 'ADMIN' %}
+                            <form method="POST" action="{{ url_for('comment_delete', comment_id=comment.id) }}" class="inline-form" onsubmit="return confirmDelete('댓글을 삭제하시겠습니까?');">
+                                <button type="submit" class="btn-text text-danger">삭제</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div class="comment-body">
+                        {{ comment.content }}
+                    </div>
+                    
+                    {% if current_user_id %}
+                        <button class="btn-text reply-toggle" onclick="toggleReplyForm({{ comment.id }})">답글 달기</button>
+                        
+                        <div id="reply-form-{{ comment.id }}" class="reply-form" style="display: none;">
+                            <form method="POST" action="{{ url_for('comment_create', post_id=post.id) }}">
+                                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                                <textarea name="content" required placeholder="대댓글을 입력하세요..." rows="2"></textarea>
+                                <button type="submit" class="btn btn-primary btn-sm">대댓글 등록</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Nested Replies -->
+                    {% if comment.replies %}
+                        <div class="replies-list">
+                            {% for reply in comment.replies %}
+                                <div class="reply-item">
+                                    <div class="comment-header">
+                                        <strong>↳ {{ reply.author }}</strong>
+                                        <span class="comment-date">{{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                        {% if session.get('db_id') == reply.user_id or current_user_role == 'ADMIN' %}
+                                            <form method="POST" action="{{ url_for('comment_delete', comment_id=reply.id) }}" class="inline-form" onsubmit="return confirmDelete('대댓글을 삭제하시겠습니까?');">
+                                                <button type="submit" class="btn-text text-danger">삭제</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                    <div class="comment-body">
+                                        {{ reply.content }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p>아직 등록된 댓글이 없습니다.</p>
+            {% endfor %}
+        </div>
+        
+        {% if current_user_id %}
+            <div class="comment-create">
+                <form method="POST" action="{{ url_for('comment_create', post_id=post.id) }}">
+                    <textarea name="content" required placeholder="댓글을 입력하세요..." rows="3"></textarea>
+                    <button type="submit" class="btn btn-primary">댓글 등록</button>
+                </form>
+            </div>
+        {% else %}
+            <div class="comment-login-prompt">
+                <p>댓글을 작성하려면 <a href="{{ url_for('login') }}">로그인</a>이 필요합니다.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

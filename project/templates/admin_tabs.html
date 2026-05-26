@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-container">
+    <h2>관리자 메뉴 - 게시판 탭 관리</h2>
+    <p>게시판 탭을 추가, 수정, 삭제할 수 있습니다.</p>
+    
+    <div class="admin-section">
+        <h3>새 탭 추가</h3>
+        <form method="POST" action="{{ url_for('admin_tabs') }}" class="inline-form">
+            <input type="text" name="name" placeholder="새 탭 이름" required>
+            <button type="submit" class="btn btn-primary">추가</button>
+        </form>
+    </div>
+    
+    <div class="admin-section">
+        <h3>현재 탭 목록</h3>
+        <table class="board-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>탭 이름</th>
+                    <th>생성일</th>
+                    <th>관리</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tab in tabs %}
+                <tr>
+                    <td>{{ tab.id }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin_tab_edit', tab_id=tab.id) }}" class="inline-form">
+                            <input type="text" name="name" value="{{ tab.name }}" required>
+                            <button type="submit" class="btn btn-outline btn-sm">수정</button>
+                        </form>
+                    </td>
+                    <td>{{ tab.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin_tab_delete', tab_id=tab.id) }}" onsubmit="return confirmDelete('탭을 삭제하시겠습니까? 관련된 글은 모두 기본 탭으로 변경됩니다.');" class="inline-form">
+                            <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-center">등록된 탭이 없습니다.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

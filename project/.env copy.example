@@ -1,0 +1,5 @@
+# Supabase PostgreSQL Connection String
+DATABASE_URL=postgresql://postgres:6yCXfg0FeN7d7zZ6@db.mpmlkgszkysgupdsafgw.supabase.co:5432/postgres
+
+# Flask Secret Key for Session
+SECRET_KEY=dev-secret-key

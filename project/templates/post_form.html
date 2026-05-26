@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <h2>{% if post %}게시글 수정{% else %}새 게시글 작성{% endif %}</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="tab_id">게시판 탭</label>
+            <select name="tab_id" id="tab_id" required>
+                <option value="" disabled {% if not post %}selected{% endif %}>탭을 선택하세요</option>
+                {% for tab in tabs %}
+                    <option value="{{ tab.id }}" {% if post and post.tab_id == tab.id %}selected{% endif %}>{{ tab.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" value="{{ post.title if post else '' }}" required placeholder="제목을 입력하세요">
+        </div>
+        
+        <div class="form-group">
+            <label for="content">본문</label>
+            <textarea id="content" name="content" rows="15" required placeholder="내용을 입력하세요">{{ post.content if post else '' }}</textarea>
+        </div>
+        
+        <div class="form-actions">
+            <a href="javascript:history.back()" class="btn btn-outline">취소</a>
+            <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="account-container">
+    <h2>계정 관리</h2>
+    
+    <div class="account-info">
+        <p><strong>아이디:</strong> {{ current_user_id }}</p>
+        <p><strong>권한:</strong> <span class="role-badge role-{{ current_user_role|lower }}">{{ current_user_role }}</span></p>
+    </div>
+    
+    <hr>
+    
+    <h3>닉네임 수정</h3>
+    <form method="POST" action="{{ url_for('account') }}" class="inline-form">
+        <div class="form-group">
+            <input type="text" name="nickname" value="{{ current_user_nickname }}" required>
+            <button type="submit" class="btn btn-primary">변경</button>
+        </div>
+    </form>
+    
+    <hr>
+    
+    <h3>계정 탈퇴</h3>
+    <p class="text-danger">탈퇴 시 모든 개인 정보가 삭제되며, 작성한 게시글 및 댓글은 탈퇴 전 직접 삭제하지 않으면 남아있거나 일괄 정리될 수 있습니다.</p>
+    <form method="POST" action="{{ url_for('account_delete') }}" onsubmit="return confirmDelete('정말 탈퇴하시겠습니까? 되돌릴 수 없습니다.');">
+        <button type="submit" class="btn btn-danger">계정 탈퇴하기</button>
+    </form>
+</div>
+{% endblock %}

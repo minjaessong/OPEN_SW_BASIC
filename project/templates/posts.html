@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="board-header">
+    <div class="tabs">
+        <a href="{{ url_for('post_list') }}" class="tab-item {% if not current_tab %}active{% endif %}">전체</a>
+        {% for tab in tabs %}
+            <a href="{{ url_for('post_list', tab_id=tab.id) }}" class="tab-item {% if current_tab == tab.id %}active{% endif %}">{{ tab.name }}</a>
+        {% endfor %}
+    </div>
+    
+    <div class="board-actions">
+        <form method="GET" action="{{ url_for('post_list') }}" class="search-form">
+            {% if current_tab %}
+                <input type="hidden" name="tab_id" value="{{ current_tab }}">
+            {% endif %}
+            <input type="text" name="search" placeholder="제목 또는 내용 검색" value="{{ search_query }}">
+            <button type="submit" class="btn btn-outline">검색</button>
+        </form>
+        
+        {% if current_user_id %}
+            <a href="{{ url_for('post_create') }}" class="btn btn-primary">글쓰기</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="post-list">
+    <table class="board-table">
+        <thead>
+            <tr>
+                <th width="10%">번호</th>
+                <th width="10%">탭</th>
+                <th width="45%">제목</th>
+                <th width="15%">작성자</th>
+                <th width="10%">조회수/반응</th>
+                <th width="10%">작성일</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in posts %}
+            <tr>
+                <td>{{ post.id }}</td>
+                <td>{{ post.tab_name or '기본' }}</td>
+                <td class="title-cell">
+                    <a href="{{ url_for('post_detail', post_id=post.id) }}">{{ post.title }}</a>
+                    {% if post.comment_count > 0 %}
+                        <span class="comment-count">[{{ post.comment_count }}]</span>
+                    {% endif %}
+                </td>
+                <td>{{ post.author }}</td>
+                <td class="reaction-cell">👍 {{ post.like_count }} 👎 {{ post.dislike_count }}</td>
+                <td>{{ post.created_at.strftime('%Y-%m-%d') }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center">등록된 게시글이 없습니다.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단국대 자유게시판</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <h1 class="logo"><a href="{{ url_for('index') }}">단국대 자유게시판</a></h1>
+            <nav class="user-nav">
+                {% if current_user_id %}
+                    <span class="welcome-msg">환영합니다, <strong>{{ current_user_nickname }}</strong>님!</span>
+                    <a href="{{ url_for('post_list') }}" class="btn btn-outline">게시판 홈</a>
+                    <a href="{{ url_for('account') }}" class="btn btn-outline">계정관리</a>
+                    {% if current_user_role == 'ADMIN' %}
+                        <a href="{{ url_for('admin_tabs') }}" class="btn btn-primary">관리자 메뉴</a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="btn btn-danger">로그아웃</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">로그인</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline">회원가입</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 단국대 자유게시판 팀 프로젝트</p>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
